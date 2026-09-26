@@ -1,0 +1,223 @@
+{
+  "skip": "Skip to content",
+  "nav": {
+    "courses": "Courses",
+    "exams": "Exam updates",
+    "resources": "Free resources",
+    "about": "Our approach",
+    "cta": "Explore GAT-B",
+    "menu": "Open menu",
+    "close": "Close menu",
+    "label": "Main navigation",
+    "language": "Choose language"
+  },
+  "hero": {
+    "eyebrow": "A NEW CHAPTER IN LIFE SCIENCES",
+    "title": "Big discoveries.",
+    "accent": "Begin with you.",
+    "description": "Build a deeper understanding of biotechnology. A thoughtful learning journey for India’s next generation of life scientists — starting with GAT-B.",
+    "primary": "Explore GAT-B",
+    "secondary": "Find your exam",
+    "note": "English & Hindi",
+    "note2": "Built around understanding",
+    "visual": "THE SCIENCE OF POSSIBILITY",
+    "visualLabel": "From curiosity to discovery",
+    "molecule": "DNA · THE BLUEPRINT OF LIFE",
+    "pill": "Made for curious minds"
+  },
+  "strip": {
+    "one": "Biotechnology & life sciences",
+    "two": "A bilingual learning vision",
+    "three": "GAT-B is our first focus"
+  },
+  "courses": {
+    "eyebrow": "FIND YOUR NEXT CHAPTER",
+    "title": "Your ambition. Your path.",
+    "description": "One focused beginning. More possibilities ahead. Explore the examination you’re working towards.",
+    "featured": "OUR FIRST COURSE",
+    "badge": "In preparation",
+    "name": "GAT-B",
+    "fullName": "Graduate Aptitude Test – Biotechnology",
+    "descriptionCard": "A clearer path into biotechnology. Discover our planned approach to concepts, practice, and purposeful revision.",
+    "tag1": "Concept-led learning",
+    "tag2": "English + Hindi",
+    "tag3": "Practice & revision",
+    "link": "Discover the course",
+    "coming": "Coming soon",
+    "notify": "Notify Me",
+    "notifyHelp": "Launch alerts are not available yet. No email addresses are being collected.",
+    "postgraduate": "Postgraduate entrance",
+    "lifeSciences": "Life Sciences",
+    "biotechnology": "Biotechnology",
+    "research": "Biotechnology research",
+    "entrances": "Entrance examinations",
+    "future": "More paths to explore"
+  },
+  "approach": {
+    "eyebrow": "BUILT FOR THE WAY YOU LEARN",
+    "title": "Understand the science.",
+    "accent": "See the bigger picture.",
+    "description": "We’re shaping a learning experience that connects the fundamentals to what comes next. These features are being prepared for the course launch.",
+    "items": [
+      {
+        "title": "Clarity before complexity",
+        "text": "A planned journey from essential concepts to deeper scientific explanations."
+      },
+      {
+        "title": "Two languages. One ambition.",
+        "text": "English and Hindi learning content, with careful attention to scientific terminology."
+      },
+      {
+        "title": "Practice with purpose",
+        "text": "Planned topic practice, explanations, and assessments to help identify learning gaps."
+      },
+      {
+        "title": "Knowledge you can trust",
+        "text": "A review-first approach, with verified sources and editorial approval before lessons go live."
+      }
+    ]
+  },
+  "updates": {
+    "eyebrow": "STAY ORIENTED",
+    "title": "Exam updates, with context.",
+    "description": "Important information deserves a reliable source.",
+    "status": "Awaiting verification",
+    "name": "GAT-B examination updates",
+    "text": "Verified dates and official notifications will appear here when available.",
+    "dateLabel": "Examination date",
+    "date": "To Be Announced",
+    "foot": "No dates or deadlines have been published on this site. Always confirm examination details with the official conducting organization."
+  },
+  "resources": {
+    "eyebrow": "A LITTLE CURIOSITY GOES A LONG WAY",
+    "title": "Room to explore. Free to learn.",
+    "description": "A home for useful study material — being prepared with the same care as our courses.",
+    "status": "In preparation",
+    "items": [
+      {
+        "title": "Concept notes",
+        "text": "Concise explanations to revisit the essentials."
+      },
+      {
+        "title": "Revision guides",
+        "text": "Structured summaries to bring ideas together."
+      },
+      {
+        "title": "Practice questions",
+        "text": "Questions with reasoning, not just answers."
+      }
+    ],
+    "note": "Resources will become available after scientific and editorial review. No downloads are available yet."
+  },
+  "faq": {
+    "eyebrow": "A FEW THINGS TO KNOW",
+    "title": "Curiosity, answered.",
+    "description": "Getting to know Bioscience Mastery.",
+    "items": [
+      {
+        "question": "What is Bioscience Mastery?",
+        "answer": "Bioscience Mastery is an independent biotechnology and life sciences education platform in development for Indian students. GAT-B preparation is our first focus, with other examination courses planned for later."
+      },
+      {
+        "question": "Can I enroll in GAT-B right now?",
+        "answer": "Not yet. You can explore our course information today. Enrollment, lessons, and assessments will become available in later releases once they have been implemented and reviewed. No launch date or price has been announced."
+      },
+      {
+        "question": "Will learning be available in Hindi?",
+        "answer": "Yes. English and Hindi learning content is planned. The public website is already available in both languages; course translations will be reviewed for scientific accuracy before publication."
+      },
+      {
+        "question": "Will there be free and premium content?",
+        "answer": "Both free resources and premium learning are planned. Pricing and access details will be published before enrollment opens. This website does not currently accept payments."
+      },
+      {
+        "question": "How do Coming Soon notifications work?",
+        "answer": "Email launch alerts are not enabled yet, and the website is not collecting email addresses. A later release will add consent-based subscriptions, confirmation, and unsubscribe controls."
+      },
+      {
+        "question": "Is this an official examination website?",
+        "answer": "No. Bioscience Mastery is an independent education platform and does not claim affiliation with any university or examination authority. Important examination information will only be published after verification."
+      }
+    ]
+  },
+  "closing": {
+    "eyebrow": "YOUR NEXT CHAPTER STARTS WITH CURIOSITY",
+    "title": "Make room for your potential.",
+    "text": "Get to know our first course and the learning experience we’re building.",
+    "cta": "Explore GAT-B"
+  },
+  "footer": {
+    "description": "For curious minds. For future scientists.",
+    "sub": "Biotechnology & life sciences education, thoughtfully built.",
+    "explore": "Explore",
+    "information": "Information",
+    "faq": "Frequently asked questions",
+    "status": "Course availability",
+    "about": "Our approach",
+    "independent": "Independent education platform. No university or examination-authority affiliation.",
+    "copyright": "Bioscience Mastery",
+    "phase": "Public preview · Enrollment is not open"
+  },
+  "course": {
+    "breadcrumb": "All courses",
+    "eyebrow": "OUR FIRST LEARNING JOURNEY",
+    "title": "GAT-B",
+    "subtitle": "Graduate Aptitude Test – Biotechnology",
+    "description": "Build understanding that stays with you. We’re preparing a focused biotechnology learning experience, from the foundations to confident revision.",
+    "status": "Course in preparation",
+    "primary": "Explore the planned experience",
+    "back": "Back to homepage",
+    "overview": "A thoughtful beginning.",
+    "overviewText": "Our first course will focus on GAT-B preparation. The final curriculum and assessment rules will be mapped to the verified official syllabus and examination pattern before publication.",
+    "notSyllabus": "The learning approach below describes planned platform features. It is not an official syllabus or a published course curriculum.",
+    "planned": "THE PLANNED EXPERIENCE",
+    "learningTitle": "From understanding to application.",
+    "steps": [
+      {
+        "title": "Build your foundations",
+        "text": "Clear learning objectives, prerequisites, and essential explanations."
+      },
+      {
+        "title": "Connect the concepts",
+        "text": "Deeper explanations, scientific illustrations, and relevant applications."
+      },
+      {
+        "title": "Put ideas into practice",
+        "text": "Worked examples and practice questions with reviewed explanations."
+      },
+      {
+        "title": "Revisit and strengthen",
+        "text": "Revision notes, bookmarks, and progress tracking to support your next study session."
+      }
+    ],
+    "factsTitle": "At a glance",
+    "languageLabel": "Planned languages",
+    "languageValue": "English & Hindi",
+    "accessLabel": "Enrollment",
+    "accessValue": "Not open yet",
+    "priceLabel": "Course price",
+    "priceValue": "To be announced",
+    "launchLabel": "Launch date",
+    "launchValue": "To be announced",
+    "syllabusLabel": "Curriculum",
+    "syllabusValue": "Pending official syllabus verification",
+    "note": "No lessons, videos, tests, or purchases are available yet.",
+    "examTitle": "Looking for examination dates?",
+    "examText": "We have not published any examination dates or marking schemes. Verified information will appear in Exam updates.",
+    "examLink": "View exam updates",
+    "otherTitle": "Another examination in mind?",
+    "otherText": "Explore our upcoming course plans.",
+    "otherLink": "See Coming Soon courses"
+  },
+  "notFound": {
+    "title": "A path yet to be discovered.",
+    "text": "This page does not exist. Let’s get you back to familiar ground.",
+    "back": "Back to homepage"
+  },
+  "error": {
+    "title": "Something interrupted this page.",
+    "text": "Please try again, or return to the homepage.",
+    "retry": "Try again",
+    "back": "Back to homepage"
+  }
+}
