@@ -15,6 +15,12 @@ export default async function Page({
   if (!isLocale(locale)) notFound();
   const { supabase, user } = await requireUser(locale);
   const m = authMessages(locale);
+  const { data: deletionRequest } = await supabase
+    .from("account_deletion_requests")
+    .select("id,status")
+    .eq("user_id", user.id)
+    .in("status", ["requested", "processing"])
+    .maybeSingle();
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("display_name,preferred_language")
@@ -51,7 +57,13 @@ export default async function Page({
         <section className="deletion-section">
           <h2>{m.requestDeletion}</h2>
           <p>{m.deletionHelp}</p>
-          <AuthForm kind="deletion" locale={locale} />
+          {deletionRequest ? (
+            <p role="status" className="auth-message">
+              {m.success.deletionRequested}
+            </p>
+          ) : (
+            <AuthForm kind="deletion" locale={locale} />
+          )}
         </section>
       </div>
     </main>

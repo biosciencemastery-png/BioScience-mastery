@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { authConfig } from "@/lib/auth/config";
+import { sessionCookieOptions } from "@/lib/supabase/cookie-options";
 
 export async function proxy(request: NextRequest) {
   if (request.nextUrl.pathname === "/")
@@ -9,12 +10,7 @@ export async function proxy(request: NextRequest) {
   const config = authConfig();
   if (config) {
     const supabase = createServerClient(config.url, config.key, {
-      cookieOptions: {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: config.origin.startsWith("https:"),
-        path: "/",
-      },
+      cookieOptions: sessionCookieOptions(config.origin),
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll(values) {

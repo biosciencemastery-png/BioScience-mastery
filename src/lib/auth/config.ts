@@ -33,5 +33,5 @@ export function confirmationUrl(origin: string, locale: "en" | "hi") {
 }
 
 export function recoveryConfirmationUrl(origin: string, locale: "en" | "hi") {
-  return `${confirmationUrl(origin, locale)}?flow=recovery`;
+  return confirmationUrl(origin, locale);
 }

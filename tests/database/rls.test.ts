@@ -166,6 +166,28 @@ test("preferences are private and optional reminders default off", async () => {
     );
   });
 });
+test("deletion request RPC is repeat-safe and cannot target another user", async () => {
+  await asUser("authenticated", alice, async () => {
+    const first = await db.query(
+      "select public.request_account_deletion() as id",
+    );
+    const second = await db.query(
+      "select public.request_account_deletion() as id",
+    );
+    assert.deepEqual(first.rows, second.rows);
+    assert.deepEqual(
+      (await db.query("select user_id from public.account_deletion_requests"))
+        .rows,
+      [{ user_id: alice }],
+    );
+  });
+  await asUser("anon", "", async () => {
+    await assert.rejects(
+      db.query("select public.request_account_deletion()"),
+      /permission denied/,
+    );
+  });
+});
 test("private launch subscriptions are inaccessible to anonymous and student clients", async () => {
   for (const role of ["anon", "authenticated"] as const)
     await asUser(role, alice, async () => {
