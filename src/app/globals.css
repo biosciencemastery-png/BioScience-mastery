@@ -2178,3 +2178,26 @@ html[data-theme="dark"] .footer-disclaimer {
 html[data-theme="dark"] .footer-top a:hover {
   color: var(--teal);
 }
+
+/* Phase 4 - Dark mode contrast corrections */
+
+html[data-theme="dark"] {
+  --mint: #b2efcf;
+}
+
+html[data-theme="dark"] .hero {
+  background: #0a3035;
+  color: #f5faf7;
+}
+
+html[data-theme="dark"] .hero h1 em {
+  color: #b2efcf;
+}
+
+html[data-theme="dark"] .hero-description {
+  color: #d1e2dd;
+}
+
+html[data-theme="dark"] .hero .light-link {
+  color: #f0faf6;
+}
