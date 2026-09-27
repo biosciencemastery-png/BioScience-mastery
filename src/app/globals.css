@@ -2201,3 +2201,102 @@ html[data-theme="dark"] .hero-description {
 html[data-theme="dark"] .hero .light-link {
   color: #f0faf6;
 }
+
+/* =====================================
+   PHASE 4 - HOMEPAGE DARK MODE FIX
+   ===================================== */
+
+html[data-theme="dark"] {
+  --deep: #0a3035;
+  --mint: #b2efcf;
+}
+
+/* Keep dark hero text readable */
+
+html[data-theme="dark"] .hero,
+html[data-theme="dark"] .course-hero {
+  background: #0a3035;
+  color: #f5faf7;
+}
+
+/* Dark background for light sections */
+
+html[data-theme="dark"] .approach-section,
+html[data-theme="dark"] .faq-section,
+html[data-theme="dark"] .closing-section {
+  background: #172623;
+  border-color: var(--line);
+}
+
+/* Fix cards with white backgrounds */
+
+html[data-theme="dark"] .featured-course,
+html[data-theme="dark"] .upcoming-card,
+html[data-theme="dark"] .update-panel,
+html[data-theme="dark"] .resource-card,
+html[data-theme="dark"] .availability-card {
+  background: #20332f;
+  border-color: #38514d;
+  color: #edf5f2;
+}
+
+/* Fix text inside cards and sections */
+
+html[data-theme="dark"] .approach-section h2,
+html[data-theme="dark"] .approach-section h3,
+html[data-theme="dark"] .faq-section h2,
+html[data-theme="dark"] .faq-list summary,
+html[data-theme="dark"] .update-panel h3,
+html[data-theme="dark"] .resource-card h3,
+html[data-theme="dark"] .availability-card h2 {
+  color: #edf5f2;
+}
+
+html[data-theme="dark"] .approach-intro h2 span,
+html[data-theme="dark"] .approach-section p,
+html[data-theme="dark"] .update-copy p,
+html[data-theme="dark"] .resource-copy p,
+html[data-theme="dark"] .availability-card dd {
+  color: #c4d8d1;
+}
+
+/* Scientific illustrations */
+
+html[data-theme="dark"] .resource-art {
+  background: #29453d;
+  color: #b2efcf;
+}
+
+html[data-theme="dark"] .resource-art-1 {
+  background: #263f46;
+}
+
+html[data-theme="dark"] .resource-art-2 {
+  background: #453d30;
+}
+
+/* FAQ borders */
+
+html[data-theme="dark"] .faq-list details,
+html[data-theme="dark"] .faq-list details:first-child {
+  border-color: #38514d;
+}
+
+/* Keep CTA buttons readable */
+
+html[data-theme="dark"] .button:not(.button-mint) {
+  background: #b2efcf;
+  color: #103c35;
+}
+
+html[data-theme="dark"] .button:hover {
+  background: #d0f8e1;
+}
+
+/* Preserve contrast on dark hero buttons */
+
+html[data-theme="dark"] .hero .button,
+html[data-theme="dark"] .closing-panel .button {
+  background: #b2efcf;
+  color: #103c35;
+}
