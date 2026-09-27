@@ -31,3 +31,10 @@ export function authConfig(
 export function confirmationUrl(origin: string, locale: "en" | "hi") {
   return `${origin}/${locale}/auth/confirm`;
 }
+
+export function recoveryConfirmationUrl(
+  origin: string,
+  locale: "en" | "hi",
+) {
+  return `${confirmationUrl(origin, locale)}?flow=recovery`;
+}

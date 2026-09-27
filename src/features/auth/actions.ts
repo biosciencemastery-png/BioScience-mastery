@@ -1,7 +1,13 @@
 "use server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { authConfig, confirmationUrl } from "@/lib/auth/config";
+
+import {
+  authConfig,
+  confirmationUrl,
+  recoveryConfirmationUrl,
+} from "@/lib/auth/config";
+
 import { supabaseServer } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth/guards";
 import {
@@ -89,13 +95,55 @@ export async function forgotAction(
   try {
     const supabase = await supabaseServer();
     const { error } = await supabase.auth.resetPasswordForEmail(email.data, {
-      redirectTo: confirmationUrl(config.origin, locale.data),
+      
+redirectTo: recoveryConfirmationUrl(config.origin, locale.data),
+
     });
     if (error) return state("error", "failed");
     return state("success", "resetSent");
   } catch {
     return state("error", "failed");
   }
+}
+
+export async function pkceConfirmAction(
+  _: AuthState,
+  form: FormData,
+): Promise<AuthState> {
+  const locale = localeOf(form);
+  const code = form.get("code");
+  const flow = form.get("flow");
+
+  if (
+    !locale.success ||
+    typeof code !== "string" ||
+    !/^[A-Za-z0-9_-]{8,2048}$/.test(code) ||
+    (flow !== "recovery" && flow !== "signup")
+  ) {
+    return state("error", "link");
+  }
+
+  if (!authConfig()) {
+    return state("error", "setup");
+  }
+
+  try {
+    const supabase = await supabaseServer();
+    const { error } =
+      await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      return state("error", "link");
+    }
+  } catch {
+    return state("error", "failed");
+  }
+
+  redirect(
+    flow === "recovery"
+      ? `/${locale.data}/reset-password`
+      : `/${locale.data}/account?notice=verified`,
+  );
 }
 
 export async function confirmAction(
