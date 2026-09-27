@@ -20,9 +20,8 @@ for (const locale of ["en", "hi"]) {
     ]) {
       await expect(page.locator(`#${id}`)).toBeVisible();
     }
-    await expect(page.locator(".upcoming-card")).toHaveCount(5);
-    for (const button of await page.locator(".notify-button").all())
-      await expect(button).toBeDisabled();
+    await expect(page.locator(".exam-card")).toHaveCount(9);
+    await expect(page.locator(".exam-card img, .exam-card svg")).toHaveCount(0);
     await expect(page.locator("input, form")).toHaveCount(0);
     await expect(page.locator(".update-date strong")).toHaveText(
       locale === "en" ? "To Be Announced" : "घोषणा की प्रतीक्षा",

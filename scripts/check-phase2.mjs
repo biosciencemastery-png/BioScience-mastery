@@ -4,6 +4,9 @@ import { spawnSync } from "node:child_process";
 const env = {
   ...process.env,
   AUTH_ENABLED: "true",
+  CATALOGUE_ENABLED: "true",
+  NOTIFICATIONS_ENABLED: "false",
+  EMAIL_DELIVERY_ENABLED: "false",
   NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test_fixture_only",
   SITE_URL: "http://127.0.0.1:3000",
