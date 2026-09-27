@@ -2053,3 +2053,57 @@ html[lang="hi"] .hero-grid {
     display: none;
   }
 }
+
+/* =====================================
+   BIOSCIENCE MASTERY - PHASE 4
+   LIGHT / DARK THEME FOUNDATION
+   ===================================== */
+
+:root {
+  color-scheme: light;
+  --surface: #ffffff;
+  --surface-soft: #edf3ed;
+  --field-background: #ffffff;
+  --field-text: #152f35;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ink: #edf5f2;
+  --muted: #b7c9c5;
+  --teal: #83e1c8;
+  --deep: #e0f7ee;
+  --mint: #24574d;
+  --line: #38514d;
+  --paper: #101b1a;
+
+  --surface: #192826;
+  --surface-soft: #142320;
+  --field-background: #20332f;
+  --field-text: #f0faf6;
+}
+
+/* Theme-aware components */
+
+html[data-theme="dark"] .exam-card,
+html[data-theme="dark"] .auth-card {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .auth-section {
+  background: var(--surface-soft);
+}
+
+html[data-theme="dark"] .auth-form label {
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .auth-form input:not([type="hidden"]):not([type="checkbox"]),
+html[data-theme="dark"] .auth-form select {
+  background: var(--field-background);
+  color: var(--field-text);
+  border-color: var(--line);
+}
