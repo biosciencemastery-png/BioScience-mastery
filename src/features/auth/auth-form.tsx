@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useActionState } from "react";
@@ -68,15 +67,11 @@ export function AuthForm({
     deletion: m.requestDeletion,
   }[kind];
 
-  const showPassword = [
-    "login",
-    "register",
-    "reset",
-    "deletion",
-  ].includes(kind);
+  const showPassword = ["login", "register", "reset", "deletion"].includes(
+    kind,
+  );
 
-  const isNewPassword =
-    kind === "register" || kind === "reset";
+  const isNewPassword = kind === "register" || kind === "reset";
 
   const message =
     state.status === "error"
@@ -85,39 +80,19 @@ export function AuthForm({
 
   return (
     <form action={action} className="auth-form">
-      <input
-        type="hidden"
-        name="locale"
-        value={locale}
-      />
+      <input type="hidden" name="locale" value={locale} />
 
       {kind === "confirm" && (
         <>
-          <input
-            type="hidden"
-            name="token_hash"
-            value={token ?? ""}
-          />
-          <input
-            type="hidden"
-            name="type"
-            value={type ?? ""}
-          />
+          <input type="hidden" name="token_hash" value={token ?? ""} />
+          <input type="hidden" name="type" value={type ?? ""} />
         </>
       )}
 
       {kind === "pkce" && (
         <>
-          <input
-            type="hidden"
-            name="code"
-            value={code ?? ""}
-          />
-          <input
-            type="hidden"
-            name="flow"
-            value={flow ?? "signup"}
-          />
+          <input type="hidden" name="code" value={code ?? ""} />
+          <input type="hidden" name="flow" value={flow ?? "signup"} />
         </>
       )}
 
@@ -159,26 +134,17 @@ export function AuthForm({
           <input
             name="password"
             type="password"
-            autoComplete={
-              isNewPassword
-                ? "new-password"
-                : "current-password"
-            }
+            autoComplete={isNewPassword ? "new-password" : "current-password"}
             required
             minLength={isNewPassword ? 12 : 1}
             maxLength={128}
             aria-describedby={
-              isNewPassword
-                ? `${kind}-password-help`
-                : undefined
+              isNewPassword ? `${kind}-password-help` : undefined
             }
           />
 
           {isNewPassword && (
-            <span
-              id={`${kind}-password-help`}
-              className="auth-help"
-            >
+            <span id={`${kind}-password-help`} className="auth-help">
               {m.passwordHelp}
             </span>
           )}
@@ -190,9 +156,7 @@ export function AuthForm({
           {m.language}
           <select
             name="preferred_language"
-            defaultValue={
-              profile?.preferred_language ?? locale
-            }
+            defaultValue={profile?.preferred_language ?? locale}
           >
             <option value="en">English</option>
             <option value="hi">हिंदी</option>
@@ -202,32 +166,21 @@ export function AuthForm({
 
       {kind === "deletion" && (
         <label className="auth-checkbox">
-          <input
-            type="checkbox"
-            name="acknowledge"
-            required
-          />
+          <input type="checkbox" name="acknowledge" required />
           {m.deletionConsent}
         </label>
       )}
 
       {message && (
         <p
-          role={
-            state.status === "error"
-              ? "alert"
-              : "status"
-          }
+          role={state.status === "error" ? "alert" : "status"}
           className={`auth-message ${state.status}`}
         >
           {message}
         </p>
       )}
 
-      <button
-        className="button"
-        disabled={pending}
-      >
+      <button className="button" disabled={pending}>
         {pending ? m.pending : label}
       </button>
     </form>

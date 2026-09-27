@@ -95,9 +95,7 @@ export async function forgotAction(
   try {
     const supabase = await supabaseServer();
     const { error } = await supabase.auth.resetPasswordForEmail(email.data, {
-      
-redirectTo: recoveryConfirmationUrl(config.origin, locale.data),
-
+      redirectTo: recoveryConfirmationUrl(config.origin, locale.data),
     });
     if (error) return state("error", "failed");
     return state("success", "resetSent");
@@ -129,8 +127,7 @@ export async function pkceConfirmAction(
 
   try {
     const supabase = await supabaseServer();
-    const { error } =
-      await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
       return state("error", "link");

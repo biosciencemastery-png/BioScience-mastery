@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { authConfig } from "@/lib/auth/config";
@@ -27,9 +26,7 @@ export default async function Page({
   const config = authConfig();
 
   const isPkce = typeof query.code === "string";
-  const validCode =
-    isPkce &&
-    /^[A-Za-z0-9_-]{8,2048}$/.test(query.code ?? "");
+  const validCode = isPkce && /^[A-Za-z0-9_-]{8,2048}$/.test(query.code ?? "");
 
   const input = confirmationSchema.safeParse(query);
 
@@ -47,11 +44,7 @@ export default async function Page({
               kind="pkce"
               locale={locale}
               code={query.code}
-              flow={
-                query.flow === "recovery"
-                  ? "recovery"
-                  : "signup"
-              }
+              flow={query.flow === "recovery" ? "recovery" : "signup"}
             />
           </>
         ) : !isPkce && input.success ? (
@@ -65,18 +58,12 @@ export default async function Page({
             />
           </>
         ) : (
-          <p
-            className="auth-message error"
-            role="alert"
-          >
+          <p className="auth-message error" role="alert">
             {m.errors.link}
           </p>
         )}
 
-        <Link
-          className="text-link"
-          href={`/${locale}/login`}
-        >
+        <Link className="text-link" href={`/${locale}/login`}>
           {m.loginLink}
         </Link>
       </div>
