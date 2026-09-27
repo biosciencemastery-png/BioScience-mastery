@@ -2139,3 +2139,42 @@ html[data-theme="dark"] .auth-form select {
     transition: none;
   }
 }
+
+/* Phase 4 - Dark header and footer */
+
+html[data-theme="dark"] .site-header {
+  background: rgba(16, 27, 26, 0.96);
+  border-bottom-color: var(--line);
+}
+
+html[data-theme="dark"] .desktop-nav a,
+html[data-theme="dark"] .language-switch a {
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .language-switch a[aria-current] {
+  color: var(--teal);
+}
+
+html[data-theme="dark"] .language-switch > span {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .menu-toggle {
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .site-footer {
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .footer-top > div:not(.footer-brand) > a,
+html[data-theme="dark"] .footer-bottom,
+html[data-theme="dark"] .footer-disclaimer {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .footer-top a:hover {
+  color: var(--teal);
+}
