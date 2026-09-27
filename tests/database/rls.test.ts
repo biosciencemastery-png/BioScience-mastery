@@ -15,15 +15,187 @@ before(async () => {
     insert into auth.users values ('${alice}', '{"display_name":"Alice","role":"admin"}');`);
   for (const file of (await readdir("supabase/migrations"))
     .filter((f) => f.endsWith(".sql"))
-    .sort())
+    .sort()) {
+    // Existing Phase 2 users predate the closed Phase 4 signup gate.
+    if (file === "202609290001_student_profiles_and_legal.sql")
+      await db.query(
+        "insert into auth.users(id,raw_user_meta_data) values ($1,$2)",
+        [bob, { display_name: "Bob", locale: "hi", role: "admin" }],
+      );
     await db.exec(await readFile(`supabase/migrations/${file}`, "utf8"));
-  await db.query(
-    "insert into auth.users(id,raw_user_meta_data) values ($1,$2)",
-    [bob, { display_name: "Bob", locale: "hi", role: "admin" }],
-  );
+  }
 });
 after(async () => {
   await db.close();
+});
+test("Phase 4 direct Auth signups stay closed even when the browser is bypassed", async () => {
+  await assert.rejects(
+    db.query(
+      "insert into auth.users(id) values ('00000000-0000-4000-8000-000000000099')",
+    ),
+    /Registration is not open/,
+  );
+  assert.equal(
+    (
+      await db.query(
+        "select * from public.profiles where id='00000000-0000-4000-8000-000000000099'",
+      )
+    ).rows.length,
+    0,
+  );
+});
+test("Phase 4 signup atomically captures current consent and profile without trusting elevated roles", async () => {
+  await db.exec("begin");
+  try {
+    await db.exec("update private.registration_config set enabled=true");
+    const policies = await db.query<{ id: string }>(
+      "insert into public.legal_policy_versions(kind,locale,version,body,status,effective_at,reviewed_at,is_current) values ('terms','en','test-only','Test terms','published',now(),now(),true),('privacy','en','test-only','Test privacy','published',now(),now(),true) returning id",
+    );
+    const {
+      rows: [exam],
+    } = await db.query<{ id: string }>(
+      "select id from public.examinations where slug='gat-b'",
+    );
+    const uid = "00000000-0000-4000-8000-000000000099";
+    const metadata = {
+      display_name: "Test",
+      locale: "en",
+      role: "admin",
+      student_registration: {
+        terms: true,
+        privacy: true,
+        terms_version: policies.rows[0].id,
+        privacy_version: policies.rows[1].id,
+        details: { qualification: "Test qualification" },
+        exam_ids: [exam.id],
+        target_year: 2027,
+        marketing: false,
+      },
+    };
+    await db.query(
+      "insert into auth.users(id,raw_user_meta_data) values($1,$2)",
+      [uid, metadata],
+    );
+    assert.equal(
+      (
+        await db.query(
+          "select * from public.student_legal_acceptances where user_id=$1",
+          [uid],
+        )
+      ).rows.length,
+      2,
+    );
+    assert.deepEqual(
+      (
+        await db.query("select role from public.user_roles where user_id=$1", [
+          uid,
+        ])
+      ).rows,
+      [{ role: "student" }],
+    );
+    assert.equal(
+      (
+        await db.query(
+          "select * from public.student_exam_goals where user_id=$1",
+          [uid],
+        )
+      ).rows.length,
+      1,
+    );
+    assert.equal(
+      (
+        await db.query<{ raw_user_meta_data: Record<string, unknown> }>(
+          "select raw_user_meta_data from auth.users where id=$1",
+          [uid],
+        )
+      ).rows[0].raw_user_meta_data.student_registration,
+      undefined,
+    );
+    await assert.rejects(
+      db.query(
+        "update public.legal_policy_versions set body='changed' where id=$1",
+        [policies.rows[0].id],
+      ),
+      /immutable/,
+    );
+  } finally {
+    await db.exec("rollback");
+  }
+});
+test("Phase 4 missing consent rolls back the entire Auth signup", async () => {
+  await db.exec("begin");
+  try {
+    await db.exec("update private.registration_config set enabled=true");
+    await assert.rejects(
+      db.query(
+        "insert into auth.users(id,raw_user_meta_data) values ('00000000-0000-4000-8000-000000000099',$1)",
+        [
+          {
+            locale: "en",
+            student_registration: {
+              details: {},
+              exam_ids: [],
+              marketing: false,
+            },
+          },
+        ],
+      ),
+      /consent|Consent/,
+    );
+  } finally {
+    await db.exec("rollback");
+  }
+  assert.equal(
+    (
+      await db.query(
+        "select * from public.profiles where id='00000000-0000-4000-8000-000000000099'",
+      )
+    ).rows.length,
+    0,
+  );
+});
+test("Phase 4 profile RPC is own-user only; legal acceptance records are not client-writable", async () => {
+  await asUser("authenticated", alice, async () => {
+    const {
+      rows: [exam],
+    } = await db.query<{ id: string }>(
+      "select id from public.examinations where slug='gat-b'",
+    );
+    await db.query("select public.save_student_details($1,$2,2027,false)", [
+      { qualification: "MSc" },
+      [exam.id],
+    ]);
+    assert.deepEqual(
+      (await db.query("select user_id from public.student_academic_profiles"))
+        .rows,
+      [{ user_id: alice }],
+    );
+    assert.deepEqual(
+      (await db.query("select user_id from public.student_exam_goals")).rows,
+      [{ user_id: alice }],
+    );
+    await assert.rejects(
+      db.query(
+        "insert into public.student_legal_acceptances(user_id,policy_id) values($1,$1)",
+        [alice],
+      ),
+      /permission denied/,
+    );
+  });
+  await asUser("anon", "", async () => {
+    await assert.rejects(
+      db.query("select public.save_student_details('{}','{}',null,false)"),
+      /permission denied/,
+    );
+  });
+  await asUser("authenticated", alice, async () => {
+    await assert.rejects(
+      db.query(
+        "select public.save_student_details('{\"password\":\"bad\"}','{}',null,false)",
+      ),
+      /Invalid/,
+    );
+  });
 });
 test("launch subscriptions require confirmation, preserve unsubscribe links and queue only published courses", async () => {
   await db.exec("begin");

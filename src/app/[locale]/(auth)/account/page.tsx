@@ -1,3 +1,5 @@
+import { StudentProfileForm } from "@/features/auth/student-profile-form";
+import { examCatalogue } from "@/features/exams/catalogue";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { isLocale } from "@/lib/i18n";
@@ -26,6 +28,23 @@ export default async function Page({
     .select("display_name,preferred_language")
     .eq("id", user.id)
     .single();
+  const [academic, goals, preferences, exams] = await Promise.all([
+    supabase
+      .from("student_academic_profiles")
+      .select("details")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("student_exam_goals")
+      .select("examination_id,target_year")
+      .eq("user_id", user.id),
+    supabase
+      .from("notification_preferences")
+      .select("marketing_consent")
+      .eq("user_id", user.id)
+      .single(),
+    examCatalogue(),
+  ]);
   return (
     <main id="main" className="auth-section">
       <div className="auth-card account-card">
@@ -48,6 +67,18 @@ export default async function Page({
               display_name: profile.display_name,
               preferred_language: profile.preferred_language,
             }}
+          />
+        )}
+        {academic.error || goals.error || preferences.error ? (
+          <p role="status">{m.profileUnavailable}</p>
+        ) : (
+          <StudentProfileForm
+            locale={locale}
+            exams={exams}
+            details={academic.data?.details ?? {}}
+            selected={(goals.data ?? []).map((g) => g.examination_id)}
+            year={String(goals.data?.[0]?.target_year ?? "")}
+            marketing={preferences.data?.marketing_consent ?? false}
           />
         )}
         <form action={logoutAction}>

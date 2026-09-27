@@ -1,3 +1,4 @@
+import { themeBootScript } from "@/lib/theme";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/header";
@@ -39,7 +40,10 @@ export default async function LocaleLayout({
   if (!isLocale(locale)) notFound();
   const messages = getMessages(locale);
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body>
         <a href="#main" className="skip-link">
           {messages.skip}

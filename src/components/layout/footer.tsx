@@ -1,3 +1,4 @@
+import { policyKinds, policyTitles } from "@/features/legal/content";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
@@ -31,6 +32,11 @@ export function Footer({
           </div>
           <div>
             <p className="footer-heading">{m.footer.information}</p>
+            {policyKinds.map((kind) => (
+              <Link key={kind} href={`/${locale}/${kind}`}>
+                {policyTitles[locale][kind]}
+              </Link>
+            ))}
             <Link href={`/${locale}#approach`}>{m.footer.about}</Link>
             <Link href={`/${locale}#faq`}>{m.footer.faq}</Link>
             <Link href={`/${locale}/courses/gat-b#availability`}>

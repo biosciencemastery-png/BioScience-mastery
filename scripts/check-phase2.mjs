@@ -4,6 +4,7 @@ import { spawnSync } from "node:child_process";
 const env = {
   ...process.env,
   AUTH_ENABLED: "true",
+  REGISTRATION_ENABLED: "false",
   CATALOGUE_ENABLED: "true",
   NOTIFICATIONS_ENABLED: "false",
   EMAIL_DELIVERY_ENABLED: "false",

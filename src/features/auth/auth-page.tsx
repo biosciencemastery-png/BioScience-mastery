@@ -1,3 +1,6 @@
+import { RegistrationWizard } from "./registration-wizard";
+import { registrationPolicies } from "@/features/legal/server";
+import { examCatalogue } from "@/features/exams/catalogue";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { authConfig } from "@/lib/auth/config";
@@ -19,7 +22,9 @@ export async function AuthPage({
     configured = !!authConfig();
   return (
     <main id="main" className="auth-section">
-      <div className="auth-card">
+      <div
+        className={`auth-card ${kind === "register" ? "registration-card" : ""}`}
+      >
         <p className="eyebrow">BIOSCIENCE MASTERY</p>
         <h1>{m[kind]}</h1>
         {notice === "passwordUpdated" && (
@@ -27,7 +32,13 @@ export async function AuthPage({
             {m.success.passwordUpdated}
           </p>
         )}
-        {configured ? (
+        {kind === "register" ? (
+          <RegistrationWizard
+            locale={locale}
+            exams={await examCatalogue()}
+            policies={await registrationPolicies(locale)}
+          />
+        ) : configured ? (
           <AuthForm kind={kind} locale={locale} />
         ) : (
           <p className="auth-message" role="status">

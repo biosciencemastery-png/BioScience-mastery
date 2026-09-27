@@ -17,7 +17,6 @@ import {
 import {
   localeSchema,
   credentialsSchema,
-  registrationSchema,
   emailSchema,
   passwordSchema,
   nameSchema,
@@ -25,6 +24,12 @@ import {
   type AuthState,
 } from "@/lib/auth/validation";
 
+import {
+  wizardSchema,
+  studentInput,
+  studentProfileSchema,
+} from "./student-validation";
+import { registrationPolicies } from "@/features/legal/server";
 function state(status: "error" | "success", message: string): AuthState {
   return { status, message };
 }
@@ -54,10 +59,20 @@ export async function registerAction(
   _: AuthState,
   form: FormData,
 ): Promise<AuthState> {
-  const input = registrationSchema.safeParse(Object.fromEntries(form));
+  const input = wizardSchema.safeParse({
+    ...Object.fromEntries(form),
+    ...studentInput(form),
+  });
   if (!input.success) return state("error", "invalid");
   const config = authConfig();
   if (!config) return state("error", "setup");
+  const policies = await registrationPolicies(input.data.locale);
+  if (
+    !policies ||
+    policies.terms !== input.data.terms_version ||
+    policies.privacy !== input.data.privacy_version
+  )
+    return state("error", "setup");
   try {
     const supabase = await supabaseServer();
     const { data, error } = await supabase.auth.signUp({
@@ -68,6 +83,14 @@ export async function registerAction(
         data: {
           display_name: input.data.display_name,
           locale: input.data.locale,
+          student_registration: {
+            details: input.data.details,
+            ...input.data.goals,
+            terms: true,
+            privacy: true,
+            terms_version: policies.terms,
+            privacy_version: policies.privacy,
+          },
         },
       },
     });
@@ -243,6 +266,31 @@ export async function deletionAction(
     if (error || !requestId) return state("error", "failed");
     revalidatePath(`/${locale.data}/account`);
     return state("success", "deletionRequested");
+  } catch {
+    return state("error", "failed");
+  }
+}
+
+export async function saveStudentProfileAction(
+  _: AuthState,
+  form: FormData,
+): Promise<AuthState> {
+  const input = studentProfileSchema.safeParse({
+    locale: form.get("locale"),
+    ...studentInput(form),
+  });
+  if (!input.success) return state("error", "invalid");
+  const { supabase } = await requireUser(input.data.locale);
+  try {
+    const { error } = await supabase.rpc("save_student_details", {
+      p_details: input.data.details,
+      p_exams: input.data.goals.exam_ids,
+      p_year: input.data.goals.target_year,
+      p_marketing: input.data.goals.marketing,
+    });
+    if (error) return state("error", "failed");
+    revalidatePath(`/${input.data.locale}/account`);
+    return state("success", "profileSaved");
   } catch {
     return state("error", "failed");
   }
