@@ -1,5 +1,7 @@
 # Deploy Phase 1 to Vercel
 
+This is the historical Phase 1 guide. The current production URL is `https://biosciencemasterycom.vercel.app`. For the prepared Phase 2 branch, follow [Phase 2 setup](phase-2-setup.md); do not merge or deploy it to production without owner approval.
+
 ## Before you begin
 
 You need a GitHub account with access to this repository and a Vercel account. No Supabase, email, payment, or AI account is needed for Phase 1. Review Vercel's current plan terms and usage limits for your intended commercial use; this guide does not assume a free plan is suitable.

@@ -1,6 +1,6 @@
 # Bioscience Mastery
 
-Phase 1 public website for a bilingual biotechnology and life sciences education platform. Built with Next.js App Router, React, TypeScript, and Tailwind CSS. GAT-B is the first planned course.
+Public website and Phase 2 authentication preparation for a bilingual biotechnology and life sciences education platform. Built with Next.js App Router, React, TypeScript, and Tailwind CSS. GAT-B is the first planned course. See [Phase 2 setup and approval boundaries](docs/phase-2-setup.md) for database migrations, authentication, and secure configuration.
 
 ## What works
 
@@ -13,7 +13,7 @@ Phase 1 public website for a bilingual biotechnology and life sciences education
 
 ## Deliberately not enabled
 
-No database, authentication, enrollment, lessons, assessments, subscriptions, email sending, AI, or payments. Notify Me buttons are disabled with a visible explanation. No form collects personal information. Resource cards do not claim downloads exist. No examination dates, marking schemes, prices, testimonials, or official affiliations are invented. Phase 2 requires separate owner approval.
+Authentication is disabled until explicitly configured. Phase 2 migrations and bilingual authentication are prepared locally; hosted database changes and production deployment still require approval. Enrollment, lessons, assessments, launch-alert delivery, AI, and payments are not enabled. Notify Me buttons remain disabled. Resource cards do not claim downloads exist. No examination dates, marking schemes, prices, testimonials, or official affiliations are invented.
 
 ## Run on your computer
 
@@ -23,23 +23,23 @@ No database, authentication, enrollment, lessons, assessments, subscriptions, em
 4. Run `npm run dev`.
 5. Open <http://localhost:3000>. It redirects to the English homepage; choose हिंदी in the header for Hindi.
 
-No environment variables or external service keys are required for Phase 1. `.env.example` documents the optional site URL and indexing switch. If needed, copy it to `.env.local`; never commit that file.
+No external service keys are required for the public website with authentication disabled. `.env.example` documents the Phase 2 placeholders and feature switch. Follow the Phase 2 guide to configure `.env.local`; never commit that file.
 
 ## Commands
 
-| Command                                          | Purpose                                                          |
-| ------------------------------------------------ | ---------------------------------------------------------------- |
-| `npm run dev`                                    | Local editing and preview                                        |
-| `npm run lint`                                   | Code quality checks                                              |
-| `npm run typecheck`                              | Route and TypeScript checks                                      |
-| `npm run build`                                  | Production build                                                 |
-| `npm run start`                                  | Run the built production website                                 |
-| `npx playwright install chromium firefox webkit` | Install test browsers once                                       |
-| `npm test`                                       | Run browser and accessibility tests against the production build |
-| `npm run check`                                  | Lint, types, production build, then tests                        |
-| `npx playwright show-report`                     | Open the last browser test report                                |
+| Command                                          | Purpose                                                                                         |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `npm run dev`                                    | Local editing and preview                                                                       |
+| `npm run lint`                                   | Code quality checks                                                                             |
+| `npm run typecheck`                              | Route and TypeScript checks                                                                     |
+| `npm run build`                                  | Production build                                                                                |
+| `npm run start`                                  | Run the built production website                                                                |
+| `npx playwright install chromium firefox webkit` | Install test browsers once                                                                      |
+| `npm test`                                       | Run browser and accessibility tests against the production build                                |
+| `npm run check`                                  | Formatting, lint, types, unit/RLS tests, build, and browser tests with dummy auth configuration |
+| `npx playwright show-report`                     | Open the last browser test report                                                               |
 
-Build before running tests. On Linux, use `npx playwright install --with-deps chromium firefox webkit` to install browser system dependencies. GitHub Actions runs the same checks on pushes to main and pull requests. Browser executables are development dependencies only and are not needed by Vercel.
+Use `npm run check` for the complete suite: it builds and runs with matching dummy authentication configuration. Individual auth browser tests require that same configuration at build and runtime. On Linux, use `npx playwright install --with-deps chromium firefox webkit` to install browser system dependencies. GitHub Actions runs the same checks on pushes to main and pull requests. Browser executables are development dependencies only and are not needed by Vercel.
 
 ## Deploy
 
