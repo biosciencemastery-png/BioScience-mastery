@@ -19,7 +19,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ScienceArt } from "@/components/ui/science-art";
-import { UpcomingCourses } from "@/features/courses/upcoming-courses";
+import { examCatalogue } from "@/features/exams/catalogue";
+import { ExamCards } from "@/features/exams/cards";
+export const dynamic = "force-dynamic";
 import { getMessages, isLocale } from "@/lib/i18n";
 
 export async function generateMetadata({
@@ -136,43 +138,9 @@ export default async function Home({
             </div>
             <p>{m.courses.description}</p>
           </div>
-          <article className="featured-course">
-            <div className="featured-illustration">
-              <span className="tiny-label">{m.courses.featured}</span>
-              <ScienceArt compact />
-              <span className="illustration-caption">
-                BIOTECHNOLOGY
-                <br />
-                <strong>GAT-B</strong>
-              </span>
-            </div>
-            <div className="featured-copy">
-              <span className="badge">
-                <span className="status-dot" />
-                {m.courses.badge}
-              </span>
-              <h3>{m.courses.name}</h3>
-              <p className="course-fullname" lang="en">
-                {m.courses.fullName}
-              </p>
-              <p className="featured-description">
-                {m.courses.descriptionCard}
-              </p>
-              <div className="course-tags">
-                {[m.courses.tag1, m.courses.tag2, m.courses.tag3].map((tag) => (
-                  <span key={tag}>
-                    <Check size={14} aria-hidden="true" />
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <Link className="button" href={courseUrl}>
-                {m.courses.link}
-                <ArrowUpRight size={18} aria-hidden="true" />
-              </Link>
-            </div>
-          </article>
-          <UpcomingCourses messages={m} />
+          <div id="coming-soon">
+            <ExamCards exams={await examCatalogue()} locale={locale} />
+          </div>
         </div>
       </section>
       <section id="approach" className="section approach-section">

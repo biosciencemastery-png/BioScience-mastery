@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
 import type { Locale, Messages } from "@/lib/i18n";
@@ -51,6 +51,18 @@ export function Header({
   function languagePath(next: Locale) {
     return pathname.replace(/^\/(en|hi)(?=\/|$)/, `/${next}`);
   }
+  function switchLanguage(event: MouseEvent<HTMLAnchorElement>, next: Locale) {
+    setOpen(false);
+    // Preserve same-origin one-time email links when changing interface language.
+    if (
+      (pathname.includes("/auth/confirm") ||
+        pathname.includes("/notifications/")) &&
+      window.location.search
+    ) {
+      event.preventDefault();
+      window.location.assign(languagePath(next) + window.location.search);
+    }
+  }
   return (
     <header className="site-header" ref={header}>
       <div className="container header-inner">
@@ -64,7 +76,14 @@ export function Header({
         </Link>
         <nav className="desktop-nav" aria-label={m.nav.label}>
           {links.map(([id, label]) => (
-            <Link key={id} href={`${home}#${id}`}>
+            <Link
+              key={id}
+              href={
+                id === "courses" || id === "updates"
+                  ? `${home}/exams`
+                  : `${home}#${id}`
+              }
+            >
               {label}
             </Link>
           ))}
@@ -89,7 +108,7 @@ export function Header({
               lang="en"
               aria-label="English"
               aria-current={locale === "en" ? "true" : undefined}
-              onClick={() => setOpen(false)}
+              onClick={(event) => switchLanguage(event, "en")}
             >
               EN
             </Link>
@@ -99,7 +118,7 @@ export function Header({
               lang="hi"
               aria-label="हिंदी"
               aria-current={locale === "hi" ? "true" : undefined}
-              onClick={() => setOpen(false)}
+              onClick={(event) => switchLanguage(event, "hi")}
             >
               हिं
             </Link>
@@ -130,7 +149,15 @@ export function Header({
         hidden={!open}
       >
         {links.map(([id, label]) => (
-          <Link key={id} href={`${home}#${id}`} onClick={() => setOpen(false)}>
+          <Link
+            key={id}
+            href={
+              id === "courses" || id === "updates"
+                ? `${home}/exams`
+                : `${home}#${id}`
+            }
+            onClick={() => setOpen(false)}
+          >
             {label}
             <ArrowUpRight size={18} aria-hidden="true" />
           </Link>

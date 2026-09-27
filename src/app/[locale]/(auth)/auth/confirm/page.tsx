@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { authConfig } from "@/lib/auth/config";
 import { authMessages } from "@/lib/auth/messages";
-import { confirmationSchema } from "@/lib/auth/validation";
+import { parseEmailCallback } from "@/lib/auth/email-callback";
 import { isLocale } from "@/lib/i18n";
 import { AuthForm } from "@/features/auth/auth-form";
 
@@ -25,10 +25,7 @@ export default async function Page({
   const query = await searchParams;
   const config = authConfig();
 
-  const isPkce = typeof query.code === "string";
-  const validCode = isPkce && /^[A-Za-z0-9_-]{8,2048}$/.test(query.code ?? "");
-
-  const input = confirmationSchema.safeParse(query);
+  const input = parseEmailCallback(query);
 
   return (
     <main id="main" className="auth-section">
@@ -37,24 +34,19 @@ export default async function Page({
 
         {!config ? (
           <p className="auth-message">{m.setup}</p>
-        ) : validCode ? (
+        ) : input?.kind === "pkce" ? (
           <>
             <p>{m.confirmHelp}</p>
-            <AuthForm
-              kind="pkce"
-              locale={locale}
-              code={query.code}
-              flow={query.flow === "recovery" ? "recovery" : "signup"}
-            />
+            <AuthForm kind="pkce" locale={locale} code={input.code} />
           </>
-        ) : !isPkce && input.success ? (
+        ) : input?.kind === "token" ? (
           <>
             <p>{m.confirmHelp}</p>
             <AuthForm
               kind="confirm"
               locale={locale}
-              token={input.data.token_hash}
-              type={input.data.type}
+              token={input.token_hash}
+              type={input.type}
             />
           </>
         ) : (

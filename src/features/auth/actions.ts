@@ -11,6 +11,10 @@ import {
 import { supabaseServer } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth/guards";
 import {
+  completeEmailCallback,
+  parseEmailCallback,
+} from "@/lib/auth/email-callback";
+import {
   localeSchema,
   credentialsSchema,
   registrationSchema,
@@ -109,15 +113,8 @@ export async function pkceConfirmAction(
   form: FormData,
 ): Promise<AuthState> {
   const locale = localeOf(form);
-  const code = form.get("code");
-  const flow = form.get("flow");
-
-  if (
-    !locale.success ||
-    typeof code !== "string" ||
-    !/^[A-Za-z0-9_-]{8,2048}$/.test(code) ||
-    (flow !== "recovery" && flow !== "signup")
-  ) {
+  const input = parseEmailCallback({ code: form.get("code") });
+  if (!locale.success || !input) {
     return state("error", "link");
   }
 
@@ -125,22 +122,16 @@ export async function pkceConfirmAction(
     return state("error", "setup");
   }
 
+  let destination: string | null;
   try {
     const supabase = await supabaseServer();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (error) {
-      return state("error", "link");
-    }
+    destination = await completeEmailCallback(supabase, input, locale.data);
   } catch {
     return state("error", "failed");
   }
 
-  redirect(
-    flow === "recovery"
-      ? `/${locale.data}/reset-password`
-      : `/${locale.data}/account?notice=verified`,
-  );
+  if (!destination) return state("error", "link");
+  redirect(destination);
 }
 
 export async function confirmAction(
@@ -246,10 +237,10 @@ export async function deletionAction(
     });
     if (authError || data.user?.id !== user.id)
       return state("error", "password");
-    const { error } = await supabase
-      .from("account_deletion_requests")
-      .insert({ user_id: user.id });
-    if (error && error.code !== "23505") return state("error", "failed");
+    const { data: requestId, error } = await supabase.rpc(
+      "request_account_deletion",
+    );
+    if (error || !requestId) return state("error", "failed");
     revalidatePath(`/${locale.data}/account`);
     return state("success", "deletionRequested");
   } catch {

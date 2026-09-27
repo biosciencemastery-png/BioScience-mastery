@@ -8,7 +8,7 @@ const alice = "00000000-0000-4000-8000-000000000001";
 const bob = "00000000-0000-4000-8000-000000000002";
 before(async () => {
   // Reproduce Supabase's auth boundary in an isolated PostgreSQL engine; no hosted writes.
-  await db.exec(`create role anon; create role authenticated;
+  await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
     create schema auth; grant usage on schema auth to anon, authenticated;
     create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true),'')::uuid $$;
     create table auth.users(id uuid primary key, raw_user_meta_data jsonb default '{}'::jsonb);
@@ -24,6 +24,219 @@ before(async () => {
 });
 after(async () => {
   await db.close();
+});
+test("launch subscriptions require confirmation, preserve unsubscribe links and queue only published courses", async () => {
+  await db.exec("begin");
+  try {
+    const {
+      rows: [course],
+    } = await db.query<{ id: string }>(
+      "select id from public.courses where slug='gat-b'",
+    );
+    const request = () =>
+      db.query<{ ok: boolean }>(
+        "select public.request_launch_notification($1,$2,'hi',$3,$4,'encrypted-fixture',$5,$6) ok",
+        [
+          course.id,
+          "student@example.test",
+          "a".repeat(64),
+          "b".repeat(64),
+          "c".repeat(64),
+          "d".repeat(64),
+        ],
+      );
+    assert.equal((await request()).rows[0].ok, true);
+    assert.equal((await request()).rows[0].ok, false);
+    const {
+      rows: [sub],
+    } = await db.query<{ id: string; status: string }>(
+      "select id,status from public.course_interest_subscriptions where email_normalized='student@example.test'",
+    );
+    assert.equal(sub.status, "pending");
+    assert.equal(
+      (await db.query("select * from public.launch_notification_candidates()"))
+        .rows.length,
+      0,
+    );
+    assert.equal(
+      (
+        await db.query<{ ok: boolean }>(
+          "select public.confirm_launch_notification($1) ok",
+          ["wrong"],
+        )
+      ).rows[0].ok,
+      false,
+    );
+    assert.equal(
+      (
+        await db.query<{ ok: boolean }>(
+          "select public.confirm_launch_notification($1) ok",
+          ["a".repeat(64)],
+        )
+      ).rows[0].ok,
+      true,
+    );
+    assert.equal(
+      (
+        await db.query<{ ok: boolean }>(
+          "select public.confirm_launch_notification($1) ok",
+          ["a".repeat(64)],
+        )
+      ).rows[0].ok,
+      false,
+    );
+    const queue = () =>
+      db.query<{ ok: boolean }>(
+        "select public.queue_course_launch($1,$2,'encrypted-launch') ok",
+        [sub.id, "e".repeat(64)],
+      );
+    assert.equal((await queue()).rows[0].ok, false);
+    await db.query(
+      "update public.courses set launch_status='published' where id=$1",
+      [course.id],
+    );
+    assert.equal(
+      (await db.query("select * from public.launch_notification_candidates()"))
+        .rows.length,
+      1,
+    );
+    assert.equal((await queue()).rows[0].ok, true);
+    assert.equal((await queue()).rows[0].ok, false);
+    assert.equal(
+      (await db.query("select * from public.launch_notification_candidates()"))
+        .rows.length,
+      0,
+    );
+    const {
+      rows: [job],
+    } = await db.query<{ id: string; lease_id: string }>(
+      "select * from public.claim_notification_job()",
+    );
+    assert.ok(job.id);
+    assert.equal(
+      (await db.query("select * from public.claim_notification_job()")).rows
+        .length,
+      0,
+    );
+    await db.query("select public.finish_notification_job($1,$2,true)", [
+      job.id,
+      "00000000-0000-4000-8000-000000000000",
+    ]);
+    assert.equal(
+      (
+        await db.query<{ status: string }>(
+          "select status from public.notification_outbox where id=$1",
+          [job.id],
+        )
+      ).rows[0].status,
+      "processing",
+    );
+    assert.equal(
+      (
+        await db.query<{ ok: boolean }>(
+          "select public.unsubscribe_launch_notification($1) ok",
+          ["b".repeat(64)],
+        )
+      ).rows[0].ok,
+      true,
+    );
+    await db.query("select public.finish_notification_job($1,$2,true)", [
+      job.id,
+      job.lease_id,
+    ]);
+    assert.equal(
+      (
+        await db.query<{ status: string }>(
+          "select status from public.notification_outbox where id=$1",
+          [job.id],
+        )
+      ).rows[0].status,
+      "cancelled",
+    );
+    assert.equal(
+      (
+        await db.query<{ ok: boolean }>(
+          "select public.unsubscribe_launch_notification($1) ok",
+          ["e".repeat(64)],
+        )
+      ).rows[0].ok,
+      true,
+    );
+  } finally {
+    await db.exec("rollback");
+  }
+});
+test("expired confirmation and email flood protection fail closed", async () => {
+  await db.exec("begin");
+  try {
+    const {
+      rows: [c],
+    } = await db.query<{ id: string }>(
+      "select id from public.courses where slug='gat-b'",
+    );
+    const request = () =>
+      db.query<{ ok: boolean }>(
+        "select public.request_launch_notification($1,'expiry@example.test','en',$2,$3,'fixture',$4,$5) ok",
+        [c.id, "1".repeat(64), "2".repeat(64), "3".repeat(64), "4".repeat(64)],
+      );
+    assert.equal((await request()).rows[0].ok, true);
+    await db.exec(
+      "update public.course_interest_subscriptions set confirmation_expires_at=now()-interval '1 minute'",
+    );
+    assert.equal(
+      (
+        await db.query<{ ok: boolean }>(
+          "select public.confirm_launch_notification($1) ok",
+          ["1".repeat(64)],
+        )
+      ).rows[0].ok,
+      false,
+    );
+    for (let i = 0; i < 4; i++) await request();
+    assert.equal(
+      (
+        await db.query<{ requests: number }>(
+          "select requests from public.notification_rate_limits where bucket=$1",
+          ["email:" + "3".repeat(64)],
+        )
+      ).rows[0].requests,
+      5,
+    );
+    assert.equal(
+      (await db.query("select * from public.notification_outbox")).rows.length,
+      1,
+    );
+    assert.equal(
+      (await db.query("select * from public.claim_notification_job()")).rows
+        .length,
+      0,
+    );
+  } finally {
+    await db.exec("rollback");
+  }
+});
+test("notification tables and service RPCs deny anonymous and student clients", async () => {
+  for (const role of ["anon", "authenticated"] as const) {
+    for (const table of [
+      "notification_outbox",
+      "notification_rate_limits",
+      "notification_unsubscribe_tokens",
+    ])
+      await asUser(role, alice, async () => {
+        await assert.rejects(
+          db.query(`select * from public.${table}`),
+          /permission denied/,
+        );
+      });
+    for (const query of [
+      "select public.confirm_launch_notification('invalid')",
+      "select * from public.claim_notification_job()",
+      "select * from public.launch_notification_candidates()",
+    ])
+      await asUser(role, alice, async () => {
+        await assert.rejects(db.query(query), /permission denied/);
+      });
+  }
 });
 async function asUser(
   role: "anon" | "authenticated",
@@ -61,7 +274,7 @@ test("anonymous access sees only public catalogue and cannot read private profil
   await asUser("anon", "", async () => {
     assert.equal(
       (await db.query("select * from public.courses")).rows.length,
-      6,
+      9,
     );
     await assert.rejects(
       db.query("select * from public.profiles"),
@@ -163,6 +376,28 @@ test("preferences are private and optional reminders default off", async () => {
         )
       ).rows.length,
       0,
+    );
+  });
+});
+test("deletion request RPC is repeat-safe and cannot target another user", async () => {
+  await asUser("authenticated", alice, async () => {
+    const first = await db.query(
+      "select public.request_account_deletion() as id",
+    );
+    const second = await db.query(
+      "select public.request_account_deletion() as id",
+    );
+    assert.deepEqual(first.rows, second.rows);
+    assert.deepEqual(
+      (await db.query("select user_id from public.account_deletion_requests"))
+        .rows,
+      [{ user_id: alice }],
+    );
+  });
+  await asUser("anon", "", async () => {
+    await assert.rejects(
+      db.query("select public.request_account_deletion()"),
+      /permission denied/,
     );
   });
 });
