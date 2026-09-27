@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X, Moon, Sun } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
 import type { Locale, Messages } from "@/lib/i18n";
 
@@ -18,6 +18,29 @@ export function Header({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+useEffect(() => {
+  const savedTheme = localStorage.getItem("bsm-theme");
+
+  const preferredTheme =
+    savedTheme === "light" || savedTheme === "dark"
+      ? savedTheme
+      : window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+
+  document.documentElement.dataset.theme = preferredTheme;
+  setTheme(preferredTheme);
+}, []);
+
+function toggleTheme() {
+  const nextTheme = theme === "light" ? "dark" : "light";
+
+  document.documentElement.dataset.theme = nextTheme;
+  localStorage.setItem("bsm-theme", nextTheme);
+  setTheme(nextTheme);
+}
   const menuButton = useRef<HTMLButtonElement>(null);
   const header = useRef<HTMLElement>(null);
   const home = `/${locale}`;
@@ -89,6 +112,29 @@ export function Header({
           ))}
         </nav>
         <div className="header-actions">
+          
+<button
+  type="button"
+  className="theme-toggle"
+  onClick={toggleTheme}
+  aria-label={
+    theme === "light"
+      ? "Switch to dark mode"
+      : "Switch to light mode"
+  }
+  title={
+    theme === "light"
+      ? "Dark mode"
+      : "Light mode"
+  }
+>
+  {theme === "light" ? (
+    <Moon size={20} aria-hidden="true" />
+  ) : (
+    <Sun size={20} aria-hidden="true" />
+  )}
+</button>
+
           {authEnabled && (
             <Link
               className="account-nav"
