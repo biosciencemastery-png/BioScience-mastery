@@ -10,9 +10,11 @@ import type { Locale, Messages } from "@/lib/i18n";
 export function Header({
   locale,
   messages: m,
+  authEnabled = false,
 }: {
   locale: Locale;
   messages: Messages;
+  authEnabled?: boolean;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -25,6 +27,7 @@ export function Header({
     ["resources", m.nav.resources],
     ["approach", m.nav.about],
   ];
+  const accountLabel = locale === "hi" ? "मेरा खाता" : "My account";
 
   useEffect(() => {
     if (!open) return;
@@ -67,6 +70,15 @@ export function Header({
           ))}
         </nav>
         <div className="header-actions">
+          {authEnabled && (
+            <Link
+              className="account-nav"
+              href={`${home}/account`}
+              onClick={() => setOpen(false)}
+            >
+              {accountLabel}
+            </Link>
+          )}
           <div
             className="language-switch"
             role="group"
@@ -123,6 +135,11 @@ export function Header({
             <ArrowUpRight size={18} aria-hidden="true" />
           </Link>
         ))}
+        {authEnabled && (
+          <Link href={`${home}/account`} onClick={() => setOpen(false)}>
+            {accountLabel}
+          </Link>
+        )}
         <Link href={`${home}/courses/gat-b`} onClick={() => setOpen(false)}>
           {m.nav.cta}
           <ArrowUpRight size={18} aria-hidden="true" />

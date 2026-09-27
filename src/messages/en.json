@@ -45,7 +45,7 @@
     "link": "Discover the course",
     "coming": "Coming soon",
     "notify": "Notify Me",
-    "notifyHelp": "Launch alerts are not available yet. No email addresses are being collected.",
+    "notifyHelp": "Launch alerts are not available yet. No email addresses are being collected for launch alerts.",
     "postgraduate": "Postgraduate entrance",
     "lifeSciences": "Life Sciences",
     "biotechnology": "Biotechnology",
@@ -132,7 +132,7 @@
       },
       {
         "question": "How do Coming Soon notifications work?",
-        "answer": "Email launch alerts are not enabled yet, and the website is not collecting email addresses. A later release will add consent-based subscriptions, confirmation, and unsubscribe controls."
+        "answer": "Email launch alerts are not enabled yet, and the website is not collecting email addresses for launch alerts. A later release will add consent-based subscriptions, confirmation, and unsubscribe controls."
       },
       {
         "question": "Is this an official examination website?",

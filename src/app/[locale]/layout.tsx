@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { getMessages, isLocale, locales } from "@/lib/i18n";
 import { canIndex, siteUrl } from "@/lib/site";
+import { authConfig } from "@/lib/auth/config";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -43,7 +44,11 @@ export default async function LocaleLayout({
         <a href="#main" className="skip-link">
           {messages.skip}
         </a>
-        <Header locale={locale} messages={messages} />
+        <Header
+          locale={locale}
+          messages={messages}
+          authEnabled={!!authConfig()}
+        />
         {children}
         <Footer locale={locale} messages={messages} />
       </body>

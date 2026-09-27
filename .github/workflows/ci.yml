@@ -1,4 +1,4 @@
-name: Phase 1 checks
+name: Application checks
 on:
   push:
     branches: [main]
@@ -16,13 +16,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run build
-        env:
-          ALLOW_INDEXING: "false"
       - run: npx playwright install --with-deps chromium firefox webkit
-      - run: npm test
+      - run: npm run check
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

@@ -15,16 +15,22 @@
     "test:ui": "playwright test --ui",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run lint && npm run typecheck && npm run build && npm test"
+    "check": "node scripts/check-phase2.mjs",
+    "test:unit": "tsx --test tests/unit/*.test.ts",
+    "test:db": "tsx --test tests/database/*.test.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
     "lucide-react": "^0.577.0",
     "next": "16.3.6",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
+    "@electric-sql/pglite": "^0.5.8",
     "@playwright/test": "1.58.2",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/node": "^24.0.0",
@@ -35,6 +41,7 @@
     "playwright-core": "1.58.2",
     "prettier": "^3.9.9",
     "tailwindcss": "^4.2.1",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   }
 }
