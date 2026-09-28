@@ -26,10 +26,11 @@ export async function registrationPolicies(locale: Locale) {
   }
 }
 export async function readPolicy(locale: Locale, kind: PolicyKind) {
-  const draft = draftPolicy(locale, kind),
-    db = publicDatabase();
-  if (!db) return draft;
+  const draft = draftPolicy(locale, kind);
   try {
+    // Registration policies must remain readable when the catalogue feature is off.
+    const db = authConfig() ? await supabaseServer() : publicDatabase();
+    if (!db) return draft;
     const { data, error } = await db
       .from("legal_policy_versions")
       .select("body,version,effective_at,status")
