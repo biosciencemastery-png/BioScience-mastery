@@ -17,7 +17,9 @@
     "format:check": "prettier --check .",
     "check": "node scripts/check-phase2.mjs",
     "test:unit": "tsx --test tests/unit/*.test.ts",
-    "test:db": "tsx --test tests/database/*.test.ts"
+    "test:db": "tsx --test tests/database/*.test.ts",
+    "test:automation": "playwright test --config playwright.automation.config.ts",
+    "check:phase5": "node scripts/check-phase5.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

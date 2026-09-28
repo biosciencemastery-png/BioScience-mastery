@@ -42,6 +42,7 @@ export const config = {
     "/:locale/forgot-password",
     "/:locale/reset-password",
     "/:locale/account/:path*",
+    "/:locale/admin/:path*",
     "/:locale/auth/:path*",
     "/:locale/notifications/:path*",
     "/:locale/exams/:slug/notify",

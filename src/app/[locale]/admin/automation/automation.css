@@ -1,0 +1,113 @@
+.automation {
+  display: grid;
+  gap: 24px;
+}
+.automation h1 {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.2;
+}
+.automation h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+.automation h3 {
+  font-size: 19px;
+  margin-bottom: 12px;
+}
+.automation p {
+  margin: 10px 0;
+}
+.automation-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: start;
+}
+.automation nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.automation a {
+  color: var(--action);
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+.automation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 20px;
+}
+.automation-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: clamp(16px, 3vw, 28px);
+  min-width: 0;
+  scroll-margin-top: 100px;
+}
+.automation-record {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+  min-width: 0;
+}
+.automation-notice {
+  background: var(--notice-background);
+  color: var(--notice-text);
+  padding: 18px;
+  border-radius: 12px;
+}
+.automation-number {
+  font-size: 30px;
+  font-weight: 700;
+}
+.automation details {
+  margin: 16px 0;
+}
+.automation summary {
+  cursor: pointer;
+  font-weight: 650;
+  padding: 8px 0;
+}
+.automation :is(summary, a, button):focus-visible {
+  outline: 3px solid var(--action);
+  outline-offset: 4px;
+}
+.automation textarea {
+  width: 100%;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--field-border);
+  border-radius: 8px;
+  padding: 12px;
+  font: inherit;
+  resize: vertical;
+}
+.automation :is(blockquote, .automation-text) {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.automation blockquote {
+  border-inline-start: 3px solid var(--line);
+  padding: 12px;
+  margin: 16px 0;
+}
+.automation code {
+  overflow-wrap: anywhere;
+}
+.automation ol {
+  padding-inline-start: 20px;
+}
+.automation li {
+  margin-bottom: 16px;
+}
+.automation .auth-form {
+  max-width: 720px;
+  margin-top: 16px;
+}
+.automation .auth-message:empty {
+  display: none;
+}
