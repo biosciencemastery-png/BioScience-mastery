@@ -33,12 +33,20 @@ export function Header({
   const menuButton = useRef<HTMLButtonElement>(null);
   const header = useRef<HTMLElement>(null);
   const home = `/${locale}`;
-  const links = [
-    ["courses", m.nav.courses],
-    ["updates", m.nav.exams],
-    ["resources", m.nav.resources],
-    ["approach", m.nav.about],
-  ];
+  const isHome = pathname === home || pathname === `${home}/`;
+  const startLabel = locale === "hi" ? "शुरू करें" : "Get Started";
+  const loginLabel = locale === "hi" ? "लॉग इन" : "Log in";
+  const links = isHome
+    ? [
+        ["courses", locale === "hi" ? "परीक्षाएँ" : "Exams"],
+        ["approach", locale === "hi" ? "हमारे बारे में" : "About"],
+      ]
+    : [
+        ["courses", m.nav.courses],
+        ["updates", m.nav.exams],
+        ["resources", m.nav.resources],
+        ["approach", m.nav.about],
+      ];
   const accountLabel = locale === "hi" ? "मेरा खाता" : "My account";
 
   useEffect(() => {
@@ -76,7 +84,10 @@ export function Header({
     }
   }
   return (
-    <header className="site-header" ref={header}>
+    <header
+      className={`site-header${isHome ? " public-header" : ""}`}
+      ref={header}
+    >
       <div className="container header-inner">
         <Link
           className="brand-link"
@@ -131,13 +142,13 @@ export function Header({
             )}
           </button>
 
-          {authEnabled && (
+          {(authEnabled || isHome) && (
             <Link
               className="account-nav"
-              href={`${home}/account`}
+              href={`${home}/${isHome ? "login" : "account"}`}
               onClick={() => setOpen(false)}
             >
-              {accountLabel}
+              {isHome ? loginLabel : accountLabel}
             </Link>
           )}
           <div
@@ -162,14 +173,14 @@ export function Header({
               aria-current={locale === "hi" ? "true" : undefined}
               onClick={(event) => switchLanguage(event, "hi")}
             >
-              हिं
+              {isHome ? "हिंदी" : "हिं"}
             </Link>
           </div>
           <Link
             className="button button-small header-cta"
-            href={`${home}/courses/gat-b`}
+            href={`${home}/${isHome ? "register" : "courses/gat-b"}`}
           >
-            {m.nav.cta}
+            {isHome ? startLabel : m.nav.cta}
             <ArrowUpRight size={16} aria-hidden="true" />
           </Link>
           <button
@@ -204,13 +215,19 @@ export function Header({
             <ArrowUpRight size={18} aria-hidden="true" />
           </Link>
         ))}
-        {authEnabled && (
-          <Link href={`${home}/account`} onClick={() => setOpen(false)}>
-            {accountLabel}
+        {(authEnabled || isHome) && (
+          <Link
+            href={`${home}/${isHome ? "login" : "account"}`}
+            onClick={() => setOpen(false)}
+          >
+            {isHome ? loginLabel : accountLabel}
           </Link>
         )}
-        <Link href={`${home}/courses/gat-b`} onClick={() => setOpen(false)}>
-          {m.nav.cta}
+        <Link
+          href={`${home}/${isHome ? "register" : "courses/gat-b"}`}
+          onClick={() => setOpen(false)}
+        >
+          {isHome ? startLabel : m.nav.cta}
           <ArrowUpRight size={18} aria-hidden="true" />
         </Link>
       </nav>

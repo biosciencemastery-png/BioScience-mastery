@@ -1,3 +1,5 @@
+"use client";
+import { usePathname } from "next/navigation";
 import { policyKinds, policyTitles } from "@/features/legal/content";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
@@ -11,6 +13,39 @@ export function Footer({
   locale: Locale;
   messages: Messages;
 }) {
+  const pathname = usePathname();
+  if (pathname === `/${locale}` || pathname === `/${locale}/`)
+    return (
+      <footer className="public-footer">
+        <div className="container">
+          <div className="public-footer-top">
+            <Link href={`/${locale}`} aria-label="Bioscience Mastery">
+              <Brand />
+            </Link>
+            <nav aria-label={locale === "hi" ? "पादलेख" : "Footer"}>
+              <Link href={`/${locale}/exams`}>
+                {locale === "hi" ? "परीक्षाएँ" : "Exams"}
+              </Link>
+              <Link href={`/${locale}#approach`}>
+                {locale === "hi" ? "हमारे बारे में" : "About"}
+              </Link>
+              <a href="mailto:biosciencemastery@gmail.com">
+                {locale === "hi" ? "संपर्क करें" : "Contact"}
+              </a>
+              {policyKinds.map((kind) => (
+                <Link key={kind} href={`/${locale}/${kind}`}>
+                  {policyTitles[locale][kind]}
+                </Link>
+              ))}
+            </nav>
+          </div>
+          <div className="public-footer-bottom">
+            <span>© {new Date().getFullYear()} BioScience Mastery</span>
+            <span>{m.footer.independent}</span>
+          </div>
+        </div>
+      </footer>
+    );
   return (
     <footer className="site-footer">
       <div className="container">

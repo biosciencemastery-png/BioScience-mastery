@@ -10,26 +10,29 @@ for (const locale of ["en", "hi"]) {
     await page.goto(`/${locale}`);
     await expect(page.locator("html")).toHaveAttribute("lang", locale);
     await expect(page.locator("h1")).toHaveCount(1);
-    for (const id of [
-      "courses",
-      "coming-soon",
-      "approach",
-      "updates",
-      "resources",
-      "faq",
-    ]) {
+    for (const id of ["courses", "approach", "resources", "faq"])
       await expect(page.locator(`#${id}`)).toBeVisible();
-    }
-    await expect(page.locator(".exam-card")).toHaveCount(9);
-    await expect(page.locator(".exam-card img, .exam-card svg")).toHaveCount(0);
+    await expect(
+      page.locator(".home-marquee-track ul:not([aria-hidden]) li"),
+    ).toHaveCount(9);
     await expect(page.locator("input, form")).toHaveCount(0);
-    await expect(page.locator(".update-date strong")).toHaveText(
-      locale === "en" ? "To Be Announced" : "घोषणा की प्रतीक्षा",
-    );
-    await expect(page.locator(".hero .button")).toHaveAttribute(
+    await expect(page.locator(".home-hero .button")).toHaveAttribute(
       "href",
-      `/${locale}/courses/gat-b`,
+      `/${locale}/register`,
     );
+    await expect(page.locator(".home-features article")).toHaveCount(6);
+    await expect(page.locator(".home-availability")).toContainText(
+      locale === "en" ? "unpublished" : "अप्रकाशित",
+    );
+    await expect(
+      page.locator(`footer a[href="/${locale}/terms"]`),
+    ).toBeVisible();
+    await expect(
+      page.locator(`footer a[href="/${locale}/privacy"]`),
+    ).toBeVisible();
+    await expect(
+      page.locator(`header a[href="/${locale}/login"]`).first(),
+    ).toHaveAttribute("href", `/${locale}/login`);
     const summary = page.locator(".faq-list summary").first();
     await summary.click();
     await expect(page.locator(".faq-list details").first()).toHaveAttribute(
@@ -41,6 +44,10 @@ for (const locale of ["en", "hi"]) {
       "open",
     );
     expect(errors).toEqual([]);
+    await page.screenshot({
+      path: `test-results/homepage-${locale}.png`,
+      fullPage: true,
+    });
   });
 
   test(`${locale}: homepage and course meet automated accessibility checks`, async ({
@@ -81,6 +88,7 @@ for (const locale of ["en", "hi"]) {
           ),
         ]);
       for (const href of hrefs) {
+        if (href.startsWith("mailto:")) continue;
         const target = new URL(href, page.url());
         expect(target.origin).toBe(new URL(page.url()).origin);
         const response = await request.get(target.pathname);
@@ -146,11 +154,11 @@ test("mobile menu supports open, Escape, keyboard and destination selection", as
   await page.keyboard.press("Enter");
   await page
     .locator("#mobile-nav")
-    .getByRole("link", { name: "Free resources", exact: true })
+    .getByRole("link", { name: "About", exact: true })
     .click();
-  await expect(page).toHaveURL(/#resources$/);
+  await expect(page).toHaveURL(/#approach$/);
   await expect(page.locator("#mobile-nav")).toBeHidden();
-  await expect(page.locator("#resources")).toBeInViewport();
+  await expect(page.locator("#approach")).toBeInViewport();
 });
 
 test("no horizontal overflow at small, tablet and desktop widths", async ({
@@ -194,4 +202,41 @@ test("skip link and FAQ work by keyboard", async ({ page, isMobile }) => {
     "open",
     "",
   );
+});
+
+test("homepage marquee pause, reduced motion, theme and locale", async ({
+  page,
+}) => {
+  await page.goto("/en");
+  await page
+    .getByRole("button", { name: "Pause exam strip", exact: true })
+    .click();
+  await expect(page.locator(".home-exam-strip")).toHaveAttribute(
+    "data-paused",
+    "true",
+  );
+  await page
+    .getByRole("button", { name: "Switch to dark mode", exact: true })
+    .click();
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("link", { name: "हिंदी", exact: true }).click();
+  await expect(page).toHaveURL(/\/hi$/);
+  await expect(page.locator(".home-hero .button")).toHaveAttribute(
+    "href",
+    "/hi/register",
+  );
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(
+    await page
+      .locator(".home-marquee-track")
+      .evaluate((el) => getComputedStyle(el).animationName),
+  ).toBe("none");
+  await expect(
+    page.locator(".home-marquee-track ul[aria-hidden]"),
+  ).toBeHidden();
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+    .analyze();
+  expect(results.violations).toEqual([]);
 });
