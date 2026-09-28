@@ -6,12 +6,13 @@ import { isLocale } from "@/lib/i18n";
 import { authMessages } from "@/lib/auth/messages";
 import { AuthForm } from "@/features/auth/auth-form";
 import { logoutAction } from "@/features/auth/actions";
+import { StudentShell } from "@/features/student/shell";
 export default async function Page({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ notice?: string }>;
+  searchParams: Promise<{ notice?: string; view?: string }>;
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
@@ -45,58 +46,72 @@ export default async function Page({
       .single(),
     examCatalogue(),
   ]);
+  const query = await searchParams;
+  const targets = (goals.data ?? []).flatMap((goal) => {
+    const exam = exams?.find((item) => item.id === goal.examination_id);
+    return exam
+      ? [locale === "hi" ? exam.name_hi || exam.name : exam.name]
+      : [];
+  });
   return (
-    <main id="main" className="auth-section">
-      <div className="auth-card account-card">
-        <p className="eyebrow">BIOSCIENCE MASTERY</p>
-        <h1>{m.account}</h1>
-        {(await searchParams).notice === "failed" && (
-          <p role="alert" className="auth-message error">
-            {m.errors.failed}
-          </p>
-        )}
-        <p>{m.accountIntro}</p>
-        <p className="auth-help">{user.email}</p>
-        {error || !profile ? (
-          <p role="alert">{m.profileUnavailable}</p>
-        ) : (
-          <AuthForm
-            kind="profile"
-            locale={locale}
-            profile={{
-              display_name: profile.display_name,
-              preferred_language: profile.preferred_language,
-            }}
-          />
-        )}
-        {academic.error || goals.error || preferences.error ? (
-          <p role="status">{m.profileUnavailable}</p>
-        ) : (
-          <StudentProfileForm
-            locale={locale}
-            exams={exams}
-            details={academic.data?.details ?? {}}
-            selected={(goals.data ?? []).map((g) => g.examination_id)}
-            year={String(goals.data?.[0]?.target_year ?? "")}
-            marketing={preferences.data?.marketing_consent ?? false}
-          />
-        )}
-        <form action={logoutAction}>
-          <input type="hidden" name="locale" value={locale} />
-          <button className="button">{m.signOut}</button>
-        </form>
-        <section className="deletion-section">
-          <h2>{m.requestDeletion}</h2>
-          <p>{m.deletionHelp}</p>
-          {deletionRequest ? (
-            <p role="status" className="auth-message">
-              {m.success.deletionRequested}
+    <StudentShell
+      locale={locale}
+      settings={query.view === "settings" || !!query.notice}
+      name={profile?.display_name}
+      targets={targets}
+    >
+      <main id="main" className="auth-section">
+        <div className="auth-card account-card">
+          <p className="eyebrow">BIOSCIENCE MASTERY</p>
+          <h1>{m.account}</h1>
+          {query.notice === "failed" && (
+            <p role="alert" className="auth-message error">
+              {m.errors.failed}
             </p>
-          ) : (
-            <AuthForm kind="deletion" locale={locale} />
           )}
-        </section>
-      </div>
-    </main>
+          <p>{m.accountIntro}</p>
+          <p className="auth-help">{user.email}</p>
+          {error || !profile ? (
+            <p role="alert">{m.profileUnavailable}</p>
+          ) : (
+            <AuthForm
+              kind="profile"
+              locale={locale}
+              profile={{
+                display_name: profile.display_name,
+                preferred_language: profile.preferred_language,
+              }}
+            />
+          )}
+          {academic.error || goals.error || preferences.error ? (
+            <p role="status">{m.profileUnavailable}</p>
+          ) : (
+            <StudentProfileForm
+              locale={locale}
+              exams={exams}
+              details={academic.data?.details ?? {}}
+              selected={(goals.data ?? []).map((g) => g.examination_id)}
+              year={String(goals.data?.[0]?.target_year ?? "")}
+              marketing={preferences.data?.marketing_consent ?? false}
+            />
+          )}
+          <form action={logoutAction}>
+            <input type="hidden" name="locale" value={locale} />
+            <button className="button">{m.signOut}</button>
+          </form>
+          <section className="deletion-section">
+            <h2>{m.requestDeletion}</h2>
+            <p>{m.deletionHelp}</p>
+            {deletionRequest ? (
+              <p role="status" className="auth-message">
+                {m.success.deletionRequested}
+              </p>
+            ) : (
+              <AuthForm kind="deletion" locale={locale} />
+            )}
+          </section>
+        </div>
+      </main>
+    </StudentShell>
   );
 }
