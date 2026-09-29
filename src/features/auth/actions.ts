@@ -295,3 +295,28 @@ export async function saveStudentProfileAction(
     return state("error", "failed");
   }
 }
+export async function setActiveExamAction(form: FormData) {
+  const locale = localeOf(form);
+  const examinationId = form.get("examination_id");
+
+  if (
+    !locale.success ||
+    typeof examinationId !== "string" ||
+    !/^[0-9a-f-]{36}$/i.test(examinationId)
+  ) {
+    redirect("/en/account?notice=failed");
+  }
+
+  const { supabase } = await requireUser(locale.data);
+
+  const { error } = await supabase.rpc("set_active_student_exam", {
+    p_examination_id: examinationId,
+  });
+
+  if (error) {
+    redirect(`/${locale.data}/account?notice=failed`);
+  }
+
+  revalidatePath(`/${locale.data}/account`);
+  redirect(`/${locale.data}/account`);
+}

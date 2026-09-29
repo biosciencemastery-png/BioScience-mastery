@@ -328,3 +328,40 @@ body:has(.student-shell) > .site-footer {
     padding: 20px;
   }
 }
+/* Active examination switcher */
+
+.student-topbar form {
+  margin: 0;
+}
+
+.student-topbar select {
+  min-width: 190px;
+  max-width: 310px;
+  min-height: 40px;
+  padding: 8px 34px 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.student-topbar select:hover {
+  border-color: var(--action);
+}
+
+.student-topbar select:focus-visible {
+  outline: 3px solid var(--action);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .student-topbar select {
+    min-width: 0;
+    width: min(44vw, 190px);
+    font-size: 12px;
+  }
+}

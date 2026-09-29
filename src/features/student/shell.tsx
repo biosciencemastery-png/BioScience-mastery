@@ -26,7 +26,10 @@ import {
 } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 import { themeSnapshot, subscribeTheme, toggleTheme } from "@/lib/theme";
-import { logoutAction } from "@/features/auth/actions";
+import {
+  logoutAction,
+  setActiveExamAction,
+} from "@/features/auth/actions";
 import "./shell.css";
 
 const copy = {
@@ -143,12 +146,19 @@ export function StudentShell({
   settings,
   name,
   targets,
+  exams,
   children,
 }: {
   locale: Locale;
   settings: boolean;
   name?: string;
   targets: string[];
+  exams: {
+    id: string;
+    name: string;
+    targetYear: number | null;
+    active: boolean;
+  }[];
   children: ReactNode;
 }) {
   const m = copy[locale],
@@ -289,15 +299,43 @@ export function StudentShell({
       <div className="student-body">
         <header className="student-topbar">
           <div>
-            <button
-              className="student-menu-button"
-              onClick={() => dialog.current?.showModal()}
-              aria-label={m.menu}
-            >
-              <Menu size={22} />
-            </button>
-            <strong>{settings ? m.settings : m.dashboard}</strong>
-          </div>
+  <button
+    className="student-menu-button"
+    onClick={() => dialog.current?.showModal()}
+    aria-label={m.menu}
+  >
+    <Menu size={22} />
+  </button>
+
+  {exams.length > 0 ? (
+    <form action={setActiveExamAction}>
+      <input type="hidden" name="locale" value={locale} />
+
+      <select
+        name="examination_id"
+        defaultValue={
+          exams.find((exam) => exam.active)?.id ??
+          exams[0]?.id
+        }
+        aria-label={
+          locale === "hi"
+            ? "सक्रिय परीक्षा चुनें"
+            : "Select active examination"
+        }
+        onChange={(event) => event.currentTarget.form?.requestSubmit()}
+      >
+        {exams.map((exam) => (
+          <option key={exam.id} value={exam.id}>
+            {exam.name}
+            {exam.targetYear ? ` ${exam.targetYear}` : ""}
+          </option>
+        ))}
+      </select>
+    </form>
+  ) : (
+    <strong>{settings ? m.settings : m.dashboard}</strong>
+  )}
+</div>
           <div>
             <Link
               href={`/${locale === "en" ? "hi" : "en"}/account${settings ? "?view=settings" : ""}`}
