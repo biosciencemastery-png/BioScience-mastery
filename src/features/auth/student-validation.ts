@@ -25,8 +25,9 @@ export const academicSchema = z
   );
 export const goalsSchema = z.object({
   exam_ids: z
-    .array(z.string().uuid())
-    .max(20)
+  .array(z.string().uuid())
+  .min(1)
+  .max(20)
     .refine((ids) => new Set(ids).size === ids.length),
   target_year: z
     .union([
